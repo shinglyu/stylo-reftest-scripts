@@ -7,7 +7,7 @@ mark_as_disabled() {
   echo "new disabled: ${1}"
   grep -R "${1}" . --include *-stylo.list -l | xargs -L1 sed -i "/$1/s/^/# /"
 }
-export -f mark_as_skip
+export -f mark_as_disabled
 
 mark_as_fail() {
   echo "new fail: ${1}"
@@ -29,7 +29,10 @@ cat ${1}/crashes.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parall
 cat ${1}/fails.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_fail :::
 
 # test that timeout will make expected-fail break, so use skip
-cat ${1}/timeout.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled:::
+cat ${1}/timeout.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled :::
+
+test that load fail null will make expected-fail break, so use skip
+cat ${1}/load_fail.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled :::
 
 # for i in $(cat ${1}/fails.txt | sed 's/\"//g' | xargs -L1 -I{} basename {})
 # # for i in $(grep 'UNEXPECTED-FAIL' "${1}" | grep -Po '(?<=\| )(.*)(?===)' | xargs -L1 -I{} basename {})
@@ -62,3 +65,9 @@ find . -name *-stylo.list | xargs sed -i "s/^fails \(.* load \)/skip \1/g" # fai
 find . -name *-stylo.list | xargs sed -i 's/fails .*-if.* ==/fails ==/g' # "fails fuzzy-if" will resolve to fuzzy-if
 find . -name *-stylo.list | xargs sed -i 's/fails fuzzy.* ==/fails ==/g' # "fails fuzzy-if" will resolve to fuzzy-if
 find . -name *-stylo.list | xargs sed -i 's/^# fails /# /g' # from mark_as_skip and fails
+
+while grep -R "# # " --include *-stylo.list -q
+do
+  echo "Clean up multiple comments"
+  find . -name *-stylo.list | xargs sed -i 's/# # /# /g'
+done

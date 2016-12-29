@@ -18,7 +18,7 @@ echo ""
 echo "Is this the branch you are expecting?..."
 read
 
-bash mark_expected_fails_v2.sh ../reftest/${path}
+bash ../reftest/mark_expected_fails.sh ../reftest/${path}
 git diff
 git add -u
 git status -v
