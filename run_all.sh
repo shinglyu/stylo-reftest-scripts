@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-python download_artifact.py
+#python download_artifact.py
 path=$(find . -name "reftest-log-*" | sort -V | tail -n1)
 
 bash summarize_log.sh "${path}"
+bash intermittent.sh > "${path}/intermittent.txt"
 vim ${path}/*.txt
 
 bash diff.sh

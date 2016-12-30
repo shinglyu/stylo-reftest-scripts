@@ -19,6 +19,13 @@ unmark_as_fail() {
   echo "new pass: ${1}"
   grep -R "${1}" . --include *-stylo.list -l | xargs -L1 sed -i "/$1/s/^fails //"
 }
+export -f unmark_as_fail
+
+mark_as_random() {
+  echo "new random: ${1}"
+  grep -R "${1}" . --include *-stylo.list -l | xargs -L1 sed -i "/$1/s/^/random /"
+}
+export -f mark_as_random
 
 # Too many arguments breaks xargs, so we use for loop
 cat ${1}/crashes.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled:::
@@ -31,8 +38,12 @@ cat ${1}/fails.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel
 # test that timeout will make expected-fail break, so use skip
 cat ${1}/timeout.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled :::
 
-test that load fail null will make expected-fail break, so use skip
+# test that load fail null will make expected-fail break, so use skip
 cat ${1}/load_fail.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled :::
+
+cat ${1}/passes.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 unmark_as_fail :::
+
+cat ${1}/intermittent.txt | sed 's/\"//g' | xargs -L1 -I{} basename {} | xargs parallel -N1 mark_as_disabled :::
 
 # for i in $(cat ${1}/fails.txt | sed 's/\"//g' | xargs -L1 -I{} basename {})
 # # for i in $(grep 'UNEXPECTED-FAIL' "${1}" | grep -Po '(?<=\| )(.*)(?===)' | xargs -L1 -I{} basename {})
@@ -65,9 +76,19 @@ find . -name *-stylo.list | xargs sed -i "s/^fails \(.* load \)/skip \1/g" # fai
 find . -name *-stylo.list | xargs sed -i 's/fails .*-if.* ==/fails ==/g' # "fails fuzzy-if" will resolve to fuzzy-if
 find . -name *-stylo.list | xargs sed -i 's/fails fuzzy.* ==/fails ==/g' # "fails fuzzy-if" will resolve to fuzzy-if
 find . -name *-stylo.list | xargs sed -i 's/^# fails /# /g' # from mark_as_skip and fails
+find . -name *-stylo.list | xargs sed -i 's/random .*-if.* ==/random ==/g'
+find . -name *-stylo.list | xargs sed -i 's/random fuzzy.* ==/random ==/g'
+find . -name *-stylo.list | xargs sed -i 's/random fails.* ==/random ==/g'
 
 while grep -R "# # " --include *-stylo.list -q
 do
   echo "Clean up multiple comments"
   find . -name *-stylo.list | xargs sed -i 's/# # /# /g'
 done
+
+while grep -R "random random " --include *-stylo.list -q
+do
+  echo "Clean up multiple random "
+  find . -name *-stylo.list | xargs sed -i 's/random random /random /g'
+done
+
