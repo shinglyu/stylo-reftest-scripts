@@ -9,3 +9,4 @@ intermittent() {
 newest=$(find . -name "reftest-log-*" | sort -V | tail -n1)
 prev=$(find . -name "reftest-log-*" | sort -V | tail -n2 | head -n1)
 intermittent $newest $prev
+intermittent $prev $newest

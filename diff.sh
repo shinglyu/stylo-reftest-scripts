@@ -17,6 +17,8 @@ intermittent() {
 
 newest=$(find . -name "reftest-log-*" | sort -V | tail -n1)
 prev=$(find . -name "reftest-log-*" | sort -V | tail -n2 | head -n1)
+#newest=$1
+#prev=$2
 
 echo "$newest <-> $prev"
 
@@ -25,3 +27,4 @@ compare $newest $prev fails.txt
 compare $newest $prev timeout.txt
 compare $newest $prev load_fail.txt
 intermittent $newest $prev
+intermittent $prev $newest
