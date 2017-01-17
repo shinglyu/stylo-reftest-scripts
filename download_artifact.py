@@ -24,8 +24,11 @@ def main():
 
     label_to_id = {}
     for (key, val) in taskgraph.iteritems():
-        if val['label'].startswith('desktop-test-linux64-stylo/opt-reftest-stylo-') and not "e10s" in val['label']:
+        # if val['label'].startswith('desktop-test-linux64-stylo/opt-reftest-stylo-') and not "e10s" in val['label']:
+        if val['label'].startswith('test-linux64-stylo/opt-reftest-stylo-') and not "e10s" in val['label']:
             label_to_id[val['label']] = key
+    if len(label_to_id) == 0:
+        print("Can't find anything in the task graph")
 
     dirname = 'reftest-log-' + time.strftime("%Y-%m-%d-%H_%M_%S")
     if not os.path.exists(dirname):
