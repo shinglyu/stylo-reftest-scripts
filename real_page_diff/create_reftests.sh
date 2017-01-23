@@ -13,5 +13,5 @@ do
   echo "== ${path} ${path}" >> alexa/reftest.list
 done < alexa.txt
 
-echo 'find alexa -type f -print0 | xargs -0 sed -i "s/http//g"' >> alexa/download_pages.sh
+echo 'find . -type f -print0 | xargs -0 sed -i "s/http//g"' >> alexa/download_pages.sh
 
