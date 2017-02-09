@@ -7,9 +7,12 @@ echo "" > alexa/reftest.list
 while read line
 do
   #echo "wget -r -np -k ${line}" >> alexa/download_pages.sh
-  echo "wget --user-agent='User-Agent: ${UA}' -E -H -k -p ${line}" >> alexa/download_pages.sh
-  path=$(echo ${line} | sed -e 's/http:\/\///g')
-  path="${path}/index.html"
+  # echo "wget --user-agent='User-Agent: ${UA}' -E -H -k -p ${line}" >> alexa/download_pages.sh
+
+  hostname=$(echo ${line} | awk -F/ '{print $3}')
+  mkdir "alexa/${hostname}"
+  path="${hostname}/index.html"
+  echo "../automate-save-page-as/save_page_as '${line}' --browser 'chromium-browser' --destination '${path}'" >> alexa/download_pages.sh
   echo "== ${path} ${path}" >> alexa/reftest.list
 done < alexa.txt
 
